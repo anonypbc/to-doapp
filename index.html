@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #153677, #4e085f);
+            padding: 10px;
+        }
+
+        .todo {
+            width: 100%;
+            max-width: 540px;
+            background: #fff;
+            margin: 100px auto 20px;
+            padding: 40px 30px 70px;
+            border-radius: 20px;
+        }
+
+        .todo-form {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #edeef0;
+            border-radius: 30px;
+            padding-left: 20px;
+            margin-bottom: 25px;
+        }
+        .text {
+            text-align: center;
+        }
+        input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 10px;
+        }
+
+        button {
+            border: none;
+            outline: none;
+            padding: 16px;
+            width: 100px;
+            background: #655ca6;
+            color:#fff;
+            border-radius: 20px;
+            cursor:pointer
+        }
+        ul {
+            list-style:none
+        }
+
+        ul li {
+          display:flex; 
+          justify-content:center; 
+          align-items:center; 
+          background:#f4f4f4; 
+          margin-bottom :5px; 
+          padding :10px; 
+          border-radius :5px; 
+        }
+
+        ul li:hover {
+          background:#e4e4e4
+        }
+        
+        .delete-button{
+          margin-left:auto; 
+          background-color:red; 
+          color:white; 
+          border:none; 
+          border-radius :5px; 
+          padding :5px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="todo">
+            <h1 class = "text">Todo List</h1>
+            <form id="todo-form" class="todo-form">
+                <input type="text" id="todo-input" placeholder="Enter a new todo">
+                <button>Add</button>
+            </form>
+            <ul id="todo-list">
+                
+                <!-- Example of a todo item with a delete button -->
+                <!--
+                <li>
+                    Todo item text
+                    <button class="delete-button">Delete</button>
+                </li>
+                -->
+                
+            </ul>
+        </div>
+    </div>
+
+    <script>
+      const API_URL = 'https://retoolapi.dev/Yk6E6F/todol';
+
+      fetch(API_URL)
+      .then(response => response.json())
+      .then(todos => {
+          todos.forEach(todo => {
+              const li = document.createElement('li');
+              li.textContent = todo.text;
+
+              const deleteButton = document.createElement('button');
+              deleteButton.textContent = 'Delete';
+              deleteButton.classList.add('delete-button');
+              
+              deleteButton.addEventListener('click', () => {
+                  fetch(`${API_URL}/${todo.id}`, {
+                      method: 'DELETE'
+                  })
+                  .then(() => {
+                      li.remove();
+                  });
+              });
+              
+              li.appendChild(deleteButton);
+              document.getElementById('todo-list').appendChild(li);
+          });
+      });
+
+      document.getElementById('todo-form').addEventListener('submit', event => {
+          event.preventDefault();
+          const todoInput = document.getElementById('todo-input');
+          const todoText = todoInput.value.trim();
+          if (todoText === '') {
+              alert('Please enter a todo');
+          } else {
+              fetch(API_URL, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ text: todoText })
+              })
+              .then(response => response.json())
+              .then(todo => {
+                  const li = document.createElement('li');
+                  li.textContent = todo.text;
+
+                  const deleteButton = document.createElement('button');
+                  deleteButton.textContent = 'Delete';
+                  deleteButton.classList.add('delete-button');
+                  
+                  deleteButton.addEventListener('click', () => {
+                      fetch(`${API_URL}/${todo.id}`, {
+                          method: 'DELETE'
+                      })
+                      .then(() => {
+                          li.remove();
+                      });
+                  });
+                  
+                  li.appendChild(deleteButton);
+                  document.getElementById('todo-list').appendChild(li);
+                  todoInput.value = '';
+              });
+          }
+      });
+    </script>
+</body>
+
+</html>
